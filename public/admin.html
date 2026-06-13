@@ -2,6 +2,8 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Magma Links Admin</title>
 
 <style>
@@ -9,31 +11,52 @@
 body{
   background:#000;
   color:#fff;
-  font-family:Arial;
-  max-width:800px;
+  font-family:Arial, sans-serif;
+  max-width:900px;
   margin:auto;
   padding:30px;
 }
 
 h1{
   color:#ff9700;
+  margin-bottom:30px;
 }
 
 .item{
   border:1px solid #333;
-  padding:15px;
-  margin-bottom:10px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.alias{
+  color:#ff9700;
+  font-weight:bold;
+  text-decoration:none;
+  font-size:22px;
+}
+
+.url{
+  color:#fff;
+  word-break:break-all;
+}
+
+.botoes{
+  margin-top:15px;
+  display:flex;
+  gap:10px;
 }
 
 button{
   background:#ff9700;
+  color:#000;
   border:none;
-  padding:8px 12px;
+  padding:10px 15px;
   cursor:pointer;
+  font-weight:bold;
 }
 
-a{
-  color:#fff;
+button:hover{
+  opacity:0.9;
 }
 
 </style>
@@ -47,7 +70,7 @@ a{
 
 <script>
 
-async function carregarLinks() {
+async function carregarLinks(){
 
   const resposta =
     await fetch("/api/links");
@@ -60,31 +83,48 @@ async function carregarLinks() {
 
   lista.innerHTML = "";
 
-  for (const codigo in links) {
+  for(const codigo in links){
 
     lista.innerHTML += `
       <div class="item">
 
-<a
-  href="https://links.magmafilms.com.br/${codigo}"
-  target="_blank"
-  style="color:#ff9700;text-decoration:none;font-weight:bold;"
->
-  ${codigo}
-</a>
-
-        <br><br>
-
-        <a href="${links[codigo]}"
-           target="_blank">
-           ${links[codigo]}
+        <a
+          class="alias"
+          href="https://links.magmafilms.com.br/${codigo}"
+          target="_blank"
+        >
+          ${codigo}
         </a>
 
         <br><br>
 
-        <button onclick="excluirLink('${codigo}')">
-          Excluir
-        </button>
+        <a
+          class="url"
+          href="${links[codigo]}"
+          target="_blank"
+        >
+          ${links[codigo]}
+        </a>
+
+        <div class="botoes">
+
+          <button
+            onclick="copiarLink('${codigo}')">
+            Copiar
+          </button>
+
+          <button
+            onclick="excluirLink('${codigo}')">
+            Excluir
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+}
 
 async function copiarLink(codigo){
 
@@ -96,15 +136,15 @@ async function copiarLink(codigo){
 
 }
 
-      </div>
-    `;
-  }
-}
-
 async function excluirLink(codigo){
 
-  if(!confirm("Excluir link?"))
+  const confirmar = confirm(
+    "Deseja excluir este link?"
+  );
+
+  if(!confirmar){
     return;
+  }
 
   await fetch(
     "/api/links/" + codigo,
@@ -114,6 +154,7 @@ async function excluirLink(codigo){
   );
 
   carregarLinks();
+
 }
 
 carregarLinks();
