@@ -84,7 +84,7 @@ app.post("/encurtar", async (req, res) => {
 
   // ALTERE AQUI QUANDO CONFIGURAR O DOMÍNIO
   const linkCurto =
-    "https://magma-links.onrender.com/" + codigo;
+  "https://links.magmafilms.com.br/" + codigo;
 
   try {
 
