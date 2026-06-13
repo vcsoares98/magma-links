@@ -1,0 +1,97 @@
+:root {
+    --orange: #ff9700;
+    --black: #000000;
+    --white: #ffffff;
+}
+
+body {
+    background: var(--black);
+    color: var(--white);
+
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: Arial, sans-serif;
+}
+
+.container-main {
+    width: 420px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 18px;
+}
+
+.logo {
+    width: 220px;
+    margin-bottom: 20px;
+}
+
+.campo {
+    width: 100%;
+
+    background: transparent;
+
+    border: 1px solid #333;
+
+    padding: 14px;
+
+    color: white;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.campo:focus {
+    border-color: var(--orange);
+}
+
+.botao {
+    background: var(--orange);
+
+    border: none;
+
+    padding: 12px 30px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.botao:hover {
+    transform: scale(1.03);
+}
+
+.resultado-box {
+    text-align: center;
+    min-height: 70px;
+}
+
+#resultado {
+    color: var(--orange);
+    word-break: break-all;
+}
+
+#copiarBtn {
+    background: transparent;
+
+    border: 1px solid var(--orange);
+
+    color: var(--orange);
+
+    padding: 8px 18px;
+
+    cursor: pointer;
+}
+
+#qrcode {
+    margin-top: 10px;
+}
