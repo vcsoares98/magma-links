@@ -65,7 +65,13 @@ async function carregarLinks() {
     lista.innerHTML += `
       <div class="item">
 
-        <strong>${codigo}</strong>
+<a
+  href="https://links.magmafilms.com.br/${codigo}"
+  target="_blank"
+  style="color:#ff9700;text-decoration:none;font-weight:bold;"
+>
+  ${codigo}
+</a>
 
         <br><br>
 
@@ -79,6 +85,16 @@ async function carregarLinks() {
         <button onclick="excluirLink('${codigo}')">
           Excluir
         </button>
+
+async function copiarLink(codigo){
+
+  await navigator.clipboard.writeText(
+    "https://links.magmafilms.com.br/" + codigo
+  );
+
+  alert("Link copiado!");
+
+}
 
       </div>
     `;
