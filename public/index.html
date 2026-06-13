@@ -1,100 +1,189 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Magma Links</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magma Links</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<style>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+body{
+  background:#000;
+  color:#fff;
+  font-family:Arial, sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  margin:0;
+}
 
-    <link rel="stylesheet" href="style.css">
+.container{
+  width:100%;
+  max-width:600px;
+  text-align:center;
+  padding:20px;
+}
+
+h1{
+  color:#ff9700;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  box-sizing:border-box;
+  border:none;
+  border-radius:4px;
+}
+
+button{
+  background:#ff9700;
+  color:#000;
+  border:none;
+  padding:12px 20px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+#resultado{
+  margin-top:20px;
+}
+
+#resultado a{
+  color:#ff9700;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+#qrcode{
+  margin-top:20px;
+  max-width:250px;
+}
+
+</style>
+
 </head>
-
 <body>
 
-<div class="container-main animate__animated animate__fadeInDown">
+<div class="container">
 
-    <img src="images/logo-magma-3.png"
-         class="logo"
-         alt="Magma">
+  <h1>Magma Links</h1>
 
-    <input
-        id="url"
-        class="campo"
-        placeholder="Cole sua URL">
+  <form onsubmit="enviar(event)">
 
     <input
-        id="alias"
-        class="campo"
-        placeholder="Alias opcional">
+      id="url"
+      placeholder="Cole sua URL aqui"
+      required
+      autofocus
+    >
 
-    <button onclick="enviar()" class="botao">
-        Gerar Link
+    <input
+      id="alias"
+      placeholder="Alias opcional"
+    >
+
+    <button type="submit">
+      Gerar
     </button>
 
-    <div class="resultado-box">
+  </form>
 
-        <p id="resultado"></p>
+  <div id="resultado"></div>
 
-        <button
-            id="copiarBtn"
-            onclick="copiarLink()"
-            style="display:none;">
-            Copiar Link
-        </button>
-
-    </div>
-
-    <img id="qrcode" width="180">
+  <img
+    id="qrcode"
+    src=""
+    alt=""
+  >
 
 </div>
 
 <script>
 
-let linkGerado = "";
+async function enviar(event){
 
-async function enviar() {
+  event.preventDefault();
 
-    const url = document.getElementById("url").value;
-    const alias = document.getElementById("alias").value;
+  const url =
+    document.getElementById("url").value;
 
-    const resposta = await fetch("/encurtar", {
-        method: "POST",
+  const alias =
+    document.getElementById("alias").value;
 
-        headers: {
-            "Content-Type": "application/json"
+  try{
+
+    const resposta =
+      await fetch("/encurtar", {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
         },
 
-        body: JSON.stringify({
-            url,
-            alias
+        body:JSON.stringify({
+          url,
+          alias
         })
-    });
 
-    const dados = await resposta.json();
+      });
 
-    linkGerado = dados.link;
+    const dados =
+      await resposta.json();
 
-    document.getElementById("resultado").innerText =
-        dados.link;
+    if(dados.erro){
 
-    document.getElementById("qrcode").src =
-        dados.qr;
+      alert(dados.erro);
+      return;
 
-    document.getElementById("copiarBtn").style.display =
-        "inline-block";
-}
+    }
 
-function copiarLink() {
+    document.getElementById(
+      "resultado"
+    ).innerHTML = `
+      <a
+        href="${dados.link}"
+        target="_blank"
+      >
+        ${dados.link}
+      </a>
+    `;
 
-    navigator.clipboard.writeText(linkGerado);
+    document.getElementById(
+      "qrcode"
+    ).src = dados.qr;
 
-    alert("Link copiado.");
+    document.getElementById(
+      "url"
+    ).value = "";
+
+    document.getElementById(
+      "alias"
+    ).value = "";
+
+    document.getElementById(
+      "url"
+    ).focus();
+
+  }catch(error){
+
+    alert(
+      "Erro ao gerar link."
+    );
+
+    console.error(error);
+
+  }
+
 }
 
 </script>
