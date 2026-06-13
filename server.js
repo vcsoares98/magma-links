@@ -82,9 +82,8 @@ app.post("/encurtar", async (req, res) => {
 
   salvarLinks(links);
 
-  // ALTERE AQUI QUANDO CONFIGURAR O DOMÍNIO
   const linkCurto =
-  "https://links.magmafilms.com.br/" + codigo;
+    "https://links.magmafilms.com.br/" + codigo;
 
   try {
 
@@ -104,6 +103,32 @@ app.post("/encurtar", async (req, res) => {
     });
 
   }
+
+});
+
+// Listar todos os links
+app.get("/api/links", (req, res) => {
+
+  const links = carregarLinks();
+
+  res.json(links);
+
+});
+
+// Excluir link
+app.delete("/api/links/:codigo", (req, res) => {
+
+  const codigo = req.params.codigo;
+
+  const links = carregarLinks();
+
+  delete links[codigo];
+
+  salvarLinks(links);
+
+  res.json({
+    sucesso: true
+  });
 
 });
 

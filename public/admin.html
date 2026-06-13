@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Magma Links Admin</title>
+
+<style>
+
+body{
+  background:#000;
+  color:#fff;
+  font-family:Arial;
+  max-width:800px;
+  margin:auto;
+  padding:30px;
+}
+
+h1{
+  color:#ff9700;
+}
+
+.item{
+  border:1px solid #333;
+  padding:15px;
+  margin-bottom:10px;
+}
+
+button{
+  background:#ff9700;
+  border:none;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+a{
+  color:#fff;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>Magma Links Admin</h1>
+
+<div id="lista"></div>
+
+<script>
+
+async function carregarLinks() {
+
+  const resposta =
+    await fetch("/api/links");
+
+  const links =
+    await resposta.json();
+
+  const lista =
+    document.getElementById("lista");
+
+  lista.innerHTML = "";
+
+  for (const codigo in links) {
+
+    lista.innerHTML += `
+      <div class="item">
+
+        <strong>${codigo}</strong>
+
+        <br><br>
+
+        <a href="${links[codigo]}"
+           target="_blank">
+           ${links[codigo]}
+        </a>
+
+        <br><br>
+
+        <button onclick="excluirLink('${codigo}')">
+          Excluir
+        </button>
+
+      </div>
+    `;
+  }
+}
+
+async function excluirLink(codigo){
+
+  if(!confirm("Excluir link?"))
+    return;
+
+  await fetch(
+    "/api/links/" + codigo,
+    {
+      method:"DELETE"
+    }
+  );
+
+  carregarLinks();
+}
+
+carregarLinks();
+
+</script>
+
+</body>
+</html>
