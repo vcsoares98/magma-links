@@ -20,10 +20,38 @@ function gerarCodigo() {
   return codigo;
 }
 
+function carregarLinks() {
+  try {
+    const conteudo = fs.readFileSync(
+      "links.json",
+      "utf8"
+    );
+
+    return conteudo
+      ? JSON.parse(conteudo)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function salvarLinks(links) {
+  fs.writeFileSync(
+    "links.json",
+    JSON.stringify(links, null, 2)
+  );
+}
+
 // Criar link curto
-app.post("/encurtar", (req, res) => {
+app.post("/encurtar", async (req, res) => {
 
   let url = req.body.url;
+
+  if (!url) {
+    return res.status(400).json({
+      erro: "URL obrigatória"
+    });
+  }
 
   if (
     !url.startsWith("http://") &&
@@ -36,56 +64,68 @@ app.post("/encurtar", (req, res) => {
 
   let codigo;
 
-  if (alias) {
-    codigo = alias;
+  if (alias && alias.trim() !== "") {
+    codigo = alias.trim();
   } else {
     codigo = gerarCodigo();
   }
 
-  const links = JSON.parse(
-    fs.readFileSync("links.json")
-  );
+  const links = carregarLinks();
 
   if (links[codigo]) {
-    return res.send("Esse alias já existe");
+    return res.status(400).json({
+      erro: "Esse alias já existe"
+    });
   }
 
   links[codigo] = url;
 
-  fs.writeFileSync(
-    "links.json",
-    JSON.stringify(links, null, 2)
-  );
+  salvarLinks(links);
 
+  // ALTERE AQUI QUANDO CONFIGURAR O DOMÍNIO
   const linkCurto =
-    "https://magmafilms.com.br/" + codigo
+    "https://magma-links.onrender.com/" + codigo;
 
-  QRCode.toDataURL(linkCurto, (err, qrCode) => {
+  try {
+
+    const qrCode = await QRCode.toDataURL(
+      linkCurto
+    );
 
     res.json({
       link: linkCurto,
       qr: qrCode
     });
 
-  });
+  } catch {
 
-});   // ← ESSA CHAVE ESTAVA FALTANDO
+    res.status(500).json({
+      erro: "Erro ao gerar QR Code"
+    });
+
+  }
+
+});
 
 // Redirecionar
 app.get("/:codigo", (req, res) => {
 
   const codigo = req.params.codigo;
 
-  const links = JSON.parse(
-    fs.readFileSync("links.json")
-  );
+  const links = carregarLinks();
 
   const urlOriginal = links[codigo];
 
   if (urlOriginal) {
+
     res.redirect(urlOriginal);
+
   } else {
-    res.send("Link não encontrado");
+
+    res.status(404).send(
+      "Link não encontrado"
+    );
+
   }
 
 });
@@ -93,5 +133,7 @@ app.get("/:codigo", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(
+    `Servidor rodando na porta ${PORT}`
+  );
 });
